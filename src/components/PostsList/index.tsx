@@ -1,6 +1,7 @@
 import { postRepository } from '@/repositories/post';
 import { PostCoverImage } from '../PostCoverImage';
-import { PostHeading } from '../PostHeading';
+import { PostSummary } from '../PostSummary';
+
 //carrega a lista de posts
 export async function PostsList() {
   const posts = await postRepository.findAll();
@@ -20,18 +21,13 @@ export async function PostsList() {
               }}
               linkProps={{ href: postLink }}
             />
-            <div className='flex flex-col gap-4 sm:justify-center'>
-              <time
-                className='text-slate-600 text-sm'
-                dateTime={post.createdAt}
-              >
-                {post.createdAt}
-              </time>
-              <PostHeading as='h2' url={postLink}>
-                {post.title}
-              </PostHeading>
-              <p>{post.excerpt}</p>
-            </div>
+            <PostSummary
+              title={post.title}
+              excerpt={post.excerpt}
+              createdAt={post.createdAt}
+              postHeading='h2'
+              postLink={postLink}
+            />
           </div>
         );
       })}
