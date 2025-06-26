@@ -1,8 +1,12 @@
 import { PostCoverImage } from '../PostCoverImage';
 import { PostSummary } from '../PostSummary';
+import { findAllPublicPosts } from '@/lib/post/queries';
 
-export function PostFeatured() {
-  const slug = 'qualquer';
+export async function PostFeatured() {
+  const posts = await findAllPublicPosts();
+  const post = posts[0];
+
+  const slug = post.slug;
   const postLink = `/post/${slug}`;
   return (
     <section className='grid grid-cols-1 gap-8 mb-16 sm:grid-cols-2 group'>
@@ -10,16 +14,16 @@ export function PostFeatured() {
         imageProps={{
           width: 1200,
           height: 720,
-          src: '/images/bryen_9.png',
-          alt: 'Título do post',
+          src: post.coverImageUrl,
+          alt: post.title,
           priority: true,
         }}
         linkProps={{ href: postLink }}
       />
       <PostSummary
-        title='Teste para novos testes aprovado'
-        excerpt='"Muitas empresas e desenvolvedores individuais escolhem o Next.js justamente porque ele consegue unir simplicidade com recursos avançados."'
-        createdAt='2025-04-06T00:24:38.616Z'
+        title={post.title}
+        excerpt={post.excerpt}
+        createdAt={post.createdAt}
         postHeading='h1'
         postLink={postLink}
       />
