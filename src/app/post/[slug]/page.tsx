@@ -1,8 +1,25 @@
+import { SinglePost } from '@/components/SinglePost';
+import { findPostBySlugCached } from '@/lib/post/queries';
+import { Metadata } from 'next';
+
 type PostSlugPage = {
-  params: Promise<{ slug: string }>;
+  params: { slug: string };
 };
 
-export default async function PostSlugPage({ params }: PostSlugPage) {
+export async function GenerateMetadata({
+  params,
+}: PostSlugPage): Promise<Metadata> {
   const { slug } = await params;
-  return <h1 className='text-7xl font-extrabold py-16'>Olá: {slug}</h1>;
+
+  const post = await findPostBySlugCached(slug);
+  return {
+    title: post.title,
+    description: post.excerpt,
+  };
+}
+
+export default async function PostSlugPage({ params }: PostSlugPage) {
+  const { slug } = params;
+
+  return <SinglePost slug={slug} />;
 }
