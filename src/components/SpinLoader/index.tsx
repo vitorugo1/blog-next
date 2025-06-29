@@ -1,12 +1,6 @@
 import clsx from 'clsx';
 
-type SpinLoaderProps = {
-  containerClasses?: string;
-};
-
-export function SpinLoader({ containerClasses = '' }: SpinLoaderProps) {
-  console.log({ containerClasses });
-
+export function SpinLoader() {
   return (
     <div className={clsx('flex', 'items-center', 'justify-center')}>
       <div
