@@ -31,7 +31,7 @@ export async function generateStaticParams() {
 }
 
 export default async function PostSlugPage({ params }: PostSlugPage) {
-  const { slug } = params;
+  const { slug } = await params;
 
   return <SinglePost slug={slug} />;
 }
