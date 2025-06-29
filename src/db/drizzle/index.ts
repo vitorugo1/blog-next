@@ -10,5 +10,5 @@ export const drizzleDb = drizzle(sqliteDataBase, {
   schema: {
     posts: postsTable,
   },
-  logger: true, //para ver os loggers das consultas
+  logger: false, //para ver os loggers das consultas
 });
