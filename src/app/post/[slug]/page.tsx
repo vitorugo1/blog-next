@@ -2,7 +2,7 @@ import { SinglePost } from '@/components/SinglePost';
 import {
   findAllPublicPostsCached,
   findPostBySlugCached,
-} from '@/lib/post/queries';
+} from '@/lib/post/queries/public';
 import { Metadata } from 'next';
 
 type PostSlugPage = {
