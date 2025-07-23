@@ -1,10 +1,18 @@
 import { DeletePostButton } from '@/components/admin/DeletePostButton';
+import DisplayErrorMsg from '@/components/ErrorMessage';
 import { findAllPostsAdmin } from '@/lib/post/queries/admin';
 import clsx from 'clsx';
 import Link from 'next/link';
 
 export default async function PostsListAdmin() {
   const posts = await findAllPostsAdmin();
+  if (posts.length <= 0)
+    return (
+      <DisplayErrorMsg
+        contentTitle='Ops!'
+        content='Você ainda não criou nenhum post'
+      />
+    );
 
   return (
     <div className='mb-16'>
