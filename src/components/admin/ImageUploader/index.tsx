@@ -4,7 +4,7 @@ import { uploadImageAction } from '@/actions/upload/upload-image-action';
 import { Button } from '@/components/Button';
 import { IMG_UPLOAD_MAX_SIZE } from '@/lib/post/constants';
 import { ImageUp } from 'lucide-react';
-import { useRef, useTransition } from 'react';
+import { useRef, useState, useTransition } from 'react';
 import { toast } from 'react-toastify';
 
 export function ImageUploader() {
@@ -12,6 +12,7 @@ export function ImageUploader() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   //useTransition para executar a action
   const [isUploading, startTransition] = useTransition();
+  const [imgUrl, setImgUrl] = useState(''); //state para mostrar o preview da imagem upload
 
   function handleChooseFile() {
     //se não houver nada no current do useRef ele retorna nulo
@@ -43,10 +44,12 @@ export function ImageUploader() {
       if (result.error) {
         toast.error(result.error);
         fileInput.value = '';
+        setImgUrl('');
         return;
       }
 
-      toast.success(result.url);
+      setImgUrl(result.url);
+      toast.success('Imagem enviada');
     });
 
     fileInput.value = '';
@@ -54,10 +57,26 @@ export function ImageUploader() {
 
   return (
     <div className='flex flex-col gap-2 py-4'>
-      <Button onClick={handleChooseFile} type='button' className='self-start'>
+      <Button
+        onClick={handleChooseFile}
+        type='button'
+        className='self-start'
+        disabled={isUploading} //caso esteja carregando o upload o botão fica desativado
+      >
         <ImageUp />
         Enviar uma imagem
       </Button>
+
+      {!!imgUrl && (
+        <div className='flex flex-col gap-4'>
+          <p>
+            <b>URL:</b> {imgUrl}
+          </p>
+          {/* eslint-disable-next-line*/}
+          <img className='rounded-lg' src={imgUrl} />
+        </div>
+      )}
+
       <input
         onChange={handleChange}
         //joga no current do useRef
@@ -66,6 +85,7 @@ export function ImageUploader() {
         accept='image/*'
         name='file'
         type='file'
+        disabled={isUploading}
       />
     </div>
   );
