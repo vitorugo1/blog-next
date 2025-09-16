@@ -1,4 +1,14 @@
+import { ManagePostForm } from '@/components/admin/ManagePostForm';
+import { makePublicPost } from '@/dto/post/dto';
+import { findPostByIdCached } from '@/lib/post/queries/admin';
+import { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Editar post',
+};
 
 type AdminPostIdProps = {
   params: Promise<{
@@ -8,5 +18,17 @@ type AdminPostIdProps = {
 
 export default async function AdminPostId({ params }: AdminPostIdProps) {
   const { id } = await params;
-  return <div className='py-16 text-6xl'>AdminPostId {id}</div>;
+  const post = await findPostByIdCached(id).catch();
+
+  if (!post) notFound();
+
+  const publicPost = makePublicPost(post);
+  return (
+    <>
+      <div className='flex flex-col gap-6'>
+        <h1 className='text-xl font-extrabold'>Editar post</h1>
+        <ManagePostForm publicPost={publicPost} />
+      </div>
+    </>
+  );
 }

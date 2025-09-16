@@ -21,6 +21,7 @@ export function MenuAdmin() {
 
   const navClasses = clsx(
     'bg-slate-900 text-slate-100 rounded-lg',
+    'mb-6',
     'flex flex-col',
     'sm:flex-row sm:flex-wrap',
     !isOpen && 'h-10',
