@@ -1,6 +1,8 @@
 'use server';
 
 import { PublicPost } from '@/dto/post/dto';
+import { PostCreateSchema } from '@/lib/post/validations';
+import { PostModel } from '@/models/post/post-model';
 
 type CreatePostActionState = {
   formState: PublicPost;
@@ -22,8 +24,26 @@ export async function createPostAction(
     };
   }
   const formDataToObj = Object.fromEntries(formData.entries()); //['title', aqui vem o titulo]
+  const zodParsedObj = PostCreateSchema.safeParse(formDataToObj);
+
+  if (!zodParsedObj.success) {
+    return {
+      formState: prevState.formState,
+      errors: ['Dados inválidos'],
+    };
+  }
+
+  const validPostData = zodParsedObj.data;
+  const newPost: PostModel = {
+    ...validPostData,
+    id: Date.now().toString(),
+    slug: Math.random().toString(36),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  };
+
   return {
-    formState: prevState.formState,
+    formState: newPost,
     errors: [],
   };
 }
