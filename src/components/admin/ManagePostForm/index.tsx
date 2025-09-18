@@ -21,7 +21,7 @@ export function ManagePostForm({ publicPost }: ManagePostFormProps) {
     errors: [],
   };
   //ele retorna o estado inicial(state) na primeira vez que for acionado, e depois o retorno da action(action) nas vezes subsequentes
-  const [state, action, isPending] = useActionState(
+  const [state, action] = useActionState(
     createPostAction, //action
     initialState, //state
   );

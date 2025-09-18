@@ -3,6 +3,8 @@
 import { PublicPost } from '@/dto/post/dto';
 import { PostCreateSchema } from '@/lib/post/validations';
 import { PostModel } from '@/models/post/post-model';
+import { formatSlug } from '@/utils/format-slug';
+import { v4 as uuidV4 } from 'uuid';
 
 type CreatePostActionState = {
   formState: PublicPost;
@@ -36,8 +38,8 @@ export async function createPostAction(
   const validPostData = zodParsedObj.data;
   const newPost: PostModel = {
     ...validPostData,
-    id: Date.now().toString(),
-    slug: Math.random().toString(36),
+    id: uuidV4(),
+    slug: formatSlug(validPostData.title),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
