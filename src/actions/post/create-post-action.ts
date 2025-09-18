@@ -1,9 +1,13 @@
 'use server';
 
+import { drizzleDb } from '@/db/drizzle';
+import { postsTable } from '@/db/drizzle/schemas';
 import { PublicPost } from '@/dto/post/dto';
 import { PostCreateSchema } from '@/lib/post/validations';
 import { PostModel } from '@/models/post/post-model';
 import { formatSlug } from '@/utils/format-slug';
+import { revalidateTag } from 'next/cache';
+import { redirect } from 'next/navigation';
 import { v4 as uuidV4 } from 'uuid';
 
 type CreatePostActionState = {
@@ -44,8 +48,9 @@ export async function createPostAction(
     updatedAt: new Date().toISOString(),
   };
 
-  return {
-    formState: newPost,
-    errors: [],
-  };
+  // TODO: mover este metódo para o repositório
+  await drizzleDb.insert(postsTable).values(newPost);
+
+  revalidateTag('posts');
+  redirect(`/admin/post/${newPost.id}`);
 }
