@@ -1,10 +1,9 @@
 'use server';
 
-import { drizzleDb } from '@/db/drizzle';
-import { postsTable } from '@/db/drizzle/schemas';
 import { PublicPost } from '@/dto/post/dto';
 import { PostCreateSchema } from '@/lib/post/validations';
 import { PostModel } from '@/models/post/post-model';
+import { postRepository } from '@/repositories/post';
 import { formatSlug } from '@/utils/format-slug';
 import { revalidateTag } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -13,6 +12,7 @@ import { v4 as uuidV4 } from 'uuid';
 type CreatePostActionState = {
   formState: PublicPost;
   errors: string[];
+  success?: true;
 };
 //toda vez que a action acontecer ele irá rodar essa função, alterando o estado inicial
 //nesse caso o initial state por exemplo é zero, na primeira vez q a action rodar ela retornará zero
@@ -49,7 +49,21 @@ export async function createPostAction(
   };
 
   // TODO: mover este metódo para o repositório
-  await drizzleDb.insert(postsTable).values(newPost);
+  try {
+    await postRepository.create(newPost);
+  } catch (e: unknown) {
+    if (e instanceof Error) {
+      return {
+        formState: newPost,
+        errors: [e.message],
+      };
+    }
+
+    return {
+      formState: newPost,
+      errors: ['Erro desconhecido'],
+    };
+  }
 
   revalidateTag('posts');
   redirect(`/admin/post/${newPost.id}`);
