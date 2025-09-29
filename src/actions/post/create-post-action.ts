@@ -12,7 +12,7 @@ import { v4 as uuidV4 } from 'uuid';
 type CreatePostActionState = {
   formState: PublicPost;
   errors: string[];
-  success?: true;
+  success?: string;
 };
 //toda vez que a action acontecer ele irá rodar essa função, alterando o estado inicial
 //nesse caso o initial state por exemplo é zero, na primeira vez q a action rodar ela retornará zero
@@ -66,5 +66,5 @@ export async function createPostAction(
   }
 
   revalidateTag('posts');
-  redirect(`/admin/post/${newPost.id}`);
+  redirect(`/admin/post/${newPost.id}?created=1`);
 }

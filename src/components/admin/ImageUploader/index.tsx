@@ -2,11 +2,12 @@
 
 import { uploadImageAction } from '@/actions/upload/upload-image-action';
 import { Button } from '@/components/Button';
-import { IMG_UPLOAD_MAX_SIZE } from '@/lib/post/constants';
 import { ImageUp } from 'lucide-react';
 import { useRef, useState, useTransition } from 'react';
 import { toast } from 'react-toastify';
 
+const maxSizeUpload =
+  Number(process.env.NEXT_PUBLIC_IMG_UPLOAD_MAX_SIZE) || 921600;
 type ImageUploaderProps = {
   disabled?: boolean;
 };
@@ -32,8 +33,8 @@ export function ImageUploader({ disabled = false }: ImageUploaderProps) {
     const file = fileInput?.files?.[0]; //para o caso de serem varios uploads de arquivo
 
     if (!file) return; //caso não tenha nada no file ele retorna
-    if (file.size > IMG_UPLOAD_MAX_SIZE) {
-      const readableMaxSize = IMG_UPLOAD_MAX_SIZE / 1024;
+    if (file.size > maxSizeUpload) {
+      const readableMaxSize = maxSizeUpload / 1024;
       toast.error(`imagem muito grande. Máx.: ${readableMaxSize}KB`);
       fileInput.value = '';
       return;

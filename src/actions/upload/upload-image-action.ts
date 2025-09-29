@@ -1,12 +1,15 @@
 'use server';
 
-import {
-  IMAGE_SERVER_URL,
-  IMAGE_UPLOAD_DIRECTORY,
-  IMG_UPLOAD_MAX_SIZE,
-} from '@/lib/post/constants';
 import { mkdir, writeFile } from 'fs/promises';
 import { extname, resolve } from 'path';
+
+const maxSizeUpload =
+  Number(process.env.NEXT_PUBLIC_IMG_UPLOAD_MAX_SIZE) || 921600;
+
+const uploadDir = process.env.IMAGE_UPLOAD_DIRECTORY || 'uploads';
+
+const serverUrl =
+  process.env.IMAGE_SERVER_URL || 'http://localhost:3000/uploads';
 
 type uploadImageActionResult = {
   url: string;
@@ -26,7 +29,7 @@ export async function uploadImageAction(
     return makeResult({ error: 'Arquivo inválidos' });
   }
 
-  if (file.size > IMG_UPLOAD_MAX_SIZE) {
+  if (file.size > maxSizeUpload) {
     return makeResult({ error: 'Arquivo muito grande' });
   }
 
@@ -37,11 +40,7 @@ export async function uploadImageAction(
   const imageExtension = extname(file.name); //retorna a extensão do arquivo
   const uniqueImageName = `${Date.now()}${imageExtension}`;
 
-  const uploadFullPath = resolve(
-    process.cwd(),
-    'public',
-    IMAGE_UPLOAD_DIRECTORY,
-  );
+  const uploadFullPath = resolve(process.cwd(), 'public', uploadDir);
   await mkdir(uploadFullPath, { recursive: true }); //cria a pasta uploads caso ela não exista
 
   // js <- bytes -> Node -> Salvar bytes que o node consegue entender como arquivo
@@ -52,7 +51,7 @@ export async function uploadImageAction(
 
   await writeFile(fileFullPath, buffer);
 
-  const url = `${IMAGE_SERVER_URL}/${uniqueImageName}`;
+  const url = `${serverUrl}/${uniqueImageName}`;
   console.log(url);
 
   // TODO: enviei o arquivo
