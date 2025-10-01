@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { cookies } from 'next/headers';
+import { SignJWT, jwtVerify } from 'jose';
 
 const jwtSecretKey = process.env.JWT_SECRET_KEY;
 const jwtEncodedKey = new TextEncoder().encode(jwtSecretKey);
@@ -7,6 +8,11 @@ const jwtEncodedKey = new TextEncoder().encode(jwtSecretKey);
 const loginExpSeconds = Number(process.env.LOGIN_EXPIRATION_SECONDS) || 86400;
 const loginExpStr = process.env.LOGIN_EXPIRATION_STRING || '1d';
 const loginCookieName = process.env.LOGIN_COOKIE_NAME || 'loginSession';
+
+type JwtPayload = {
+  username: string;
+  expiresAt: Date;
+};
 
 export async function hashPassword(password: string) {
   const hash = await bcrypt.hash(password, 10);
@@ -21,7 +27,7 @@ export async function verifyPassword(password: string, base64Hash: string) {
 
 export async function createLoginSession(username: string) {
   const expiresAt = new Date(Date.now() + loginExpSeconds * 1000);
-  const loginSession = username + 'teste';
+  const loginSession = await signJwt({ username, expiresAt });
   const cookieStore = await cookies();
 
   // a estrutura é (nome do cookie, corpo do cookie(conteudo, que no caso vai ser o jwt), configuração do cookie, que permite que seja lido só no servidor) o httpOnly diz que o cookie só pode trafegar pelo protocolo http, sem poder ser lido pelo navegador. por fim a expiração do cookie
@@ -37,4 +43,15 @@ export async function deleteLoginSession() {
   const cookieStore = await cookies();
   cookieStore.set(loginCookieName, '', { expires: new Date(0) });
   cookieStore.delete(loginCookieName);
+}
+
+export async function signJwt(jwtPayload: JwtPayload) {
+  return new SignJWT(jwtPayload)
+    .setProtectedHeader({
+      alg: 'HS256',
+      typ: 'JWT',
+    })
+    .setIssuedAt()
+    .setExpirationTime(loginExpStr)
+    .sign(jwtEncodedKey);
 }
