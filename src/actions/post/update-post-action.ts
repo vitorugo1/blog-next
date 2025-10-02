@@ -5,6 +5,7 @@ import {
   makePublicPostFromDb,
   PublicPost,
 } from '@/dto/post/dto';
+import { getLoginSession } from '@/lib/login/manage-login';
 import { PostUpdateSchema } from '@/lib/post/validations';
 import { postRepository } from '@/repositories/post';
 import { makeRandomString } from '@/utils/makeRandomString';
@@ -21,6 +22,7 @@ export async function updatePostAction(
   formData: FormData,
 ): Promise<UpdatePostActionState> {
   // TODO: verificar se o usuário tá logado
+  const isAuthenticated = await getLoginSession();
 
   if (!(formData instanceof FormData)) {
     return {
@@ -41,6 +43,12 @@ export async function updatePostAction(
   const formDataToObj = Object.fromEntries(formData.entries());
   const zodParsedObj = PostUpdateSchema.safeParse(formDataToObj);
 
+  if (!isAuthenticated) {
+    return {
+      formState: makePartialPublicPost(formDataToObj),
+      errors: ['Faça login em outra aba antes de salvar'],
+    };
+  }
   if (!zodParsedObj.success) {
     return {
       errors: ['Dados inválidos'],
