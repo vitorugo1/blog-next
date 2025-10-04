@@ -3,7 +3,7 @@
 import { clsx } from 'clsx';
 
 type DisplayErrorMsgProps = {
-  pageTitle: string;
+  pageTitle?: string;
   contentTitle: string;
   content: React.ReactNode;
 };
@@ -15,7 +15,8 @@ export default function DisplayErrorMsg({
 }: DisplayErrorMsgProps) {
   return (
     <>
-      <title>{pageTitle}</title>
+      {pageTitle && <title>{pageTitle}</title>}
+
       <div
         className={clsx(
           'min-h-[320px] bg-slate-900 text-slate-100',

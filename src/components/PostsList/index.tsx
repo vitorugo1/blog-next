@@ -1,10 +1,12 @@
 import { PostCoverImage } from '../PostCoverImage';
 import { PostSummary } from '../PostSummary';
-import { findAllPublicPostsCached } from '@/lib/post/queries';
+import { findAllPublicPostsCached } from '@/lib/post/queries/public';
 
 //carrega a lista de posts
 export async function PostsList() {
   const posts = await findAllPublicPostsCached();
+
+  if (posts.length <= 1) return null;
 
   return (
     <div className='grid grid-cols-1 mb-16 gap-8 sm:grid-cols-2 lg:grid-cols-3'>
